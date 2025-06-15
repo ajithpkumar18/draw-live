@@ -2,6 +2,7 @@ import express, { Request, Response } from "express"
 import { JWT_SECRET } from "@repo/backend-common/config"
 import jwt from "jsonwebtoken"
 import { CreateRoomSchema, CreateUserSchema } from "@repo/common/types"
+import { prismaClient } from "@repo/db/db"
 
 const app = express()
 
@@ -23,6 +24,8 @@ app.get("/signup", (req: Request, res: Response) => {
         res.json({ message: "Incorrect inputs" })
         return
     }
+
+    const newUser = prismaClient.user.create(req.body)
     res.status(200).json({ userID: "123" })
 })
 
