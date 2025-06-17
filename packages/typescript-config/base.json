@@ -19,8 +19,6 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "outDir": "./dist",
-    "rootDir": "./src"
+    "allowSyntheticDefaultImports": true
   }
 }
