@@ -16,7 +16,7 @@ export default async function Room({
     params: {
         slug: string
     }
-}) {
+}): Promise<JSX.Element> {
     console.log(await params);
 
     const slug = (await params).slug;

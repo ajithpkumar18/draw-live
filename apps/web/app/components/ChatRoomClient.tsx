@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSocket } from "../hooks/useSocket";
 
-export function ChatRoomClient({ messages, id }: { messages: { message: string }[], id: string }) {
+export function ChatRoomClient({ messages, id }: { messages: { message: string }[], id: string }): JSX.Element {
 
     const [chats, setChats] = useState(messages)
     const [currentMessage, setCurrentMessage] = useState('')
