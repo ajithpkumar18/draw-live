@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { PenTool, Menu, X } from 'lucide-react'
+import Link from 'next/link'
 
 export const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false)
@@ -16,17 +17,19 @@ export const Header: React.FC = () => {
             </div>
             <span className="text-2xl font-bold text-gray-900">Excalidraw</span>
           </div>
-          
+
           <nav className="hidden md:flex items-center space-x-8">
             <a href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">Features</a>
             <a href="#about" className="text-gray-600 hover:text-gray-900 transition-colors">About</a>
             <a href="#testimonials" className="text-gray-600 hover:text-gray-900 transition-colors">Testimonials</a>
-            <button className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
-              Try Now
-            </button>
+            <Link href={"/signin"}>
+              <button className="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
+                Signin
+              </button>
+            </Link>
           </nav>
 
-          <button 
+          <button
             className="md:hidden p-2"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
