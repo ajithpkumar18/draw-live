@@ -5,9 +5,10 @@ import { CreateRoomSchema, CreateUserSchema, SigninSchema } from "@repo/common/t
 import { prismaClient } from "@repo/db/db"
 import bcrypt from "bcrypt"
 import { Middleware } from "./middleware.js"
-
+import cors from "cors"
 const app = express()
 app.use(express.json())
+app.use(cors())
 
 app.get("/", (req, res) => {
     res.status(200).json("This is the server")
@@ -52,6 +53,7 @@ app.post("/signin", async (req, res) => {
 app.post("/signup", async (req: Request, res: Response) => {
 
     const parsedData = CreateUserSchema.safeParse(req.body)
+    console.log(parsedData);
 
     if (!parsedData.success) {
         res.json({ message: "Incorrect inputs" })

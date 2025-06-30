@@ -14,20 +14,23 @@ const users: User[] = [];
 
 
 function checkUser(token: string): string | null {
-    const decoded = jwt.verify(token, JWT_SECRET);
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
 
-    console.log(decoded)
-    if (typeof (decoded) == "string") {
-        console.log(typeof (decoded), "decoded")
+        console.log(decoded)
+        if (typeof (decoded) == "string") {
+            return null;
+        }
+
+        if (!decoded || !decoded.userID) {
+            return null;
+        }
+
+        return decoded.userID;
+    }
+    catch (e) {
         return null;
     }
-
-    if (!decoded || !decoded.userID) {
-        console.log("!decoded")
-        return null;
-    }
-
-    return decoded.userID;
 }
 
 wss.on("connection", (ws, request) => {
@@ -56,7 +59,16 @@ wss.on("connection", (ws, request) => {
     })
 
     ws.on("message", async function message(data) {
-        const parsedData = JSON.parse(data as unknown as string);
+        let parsedData;
+        if (typeof data !== "string") {
+            parsedData = JSON.parse(data.toString())
+        }
+        else {
+            parsedData = JSON.parse(data);
+        }
+        console.log("parsed data", parsedData);
+        console.log("parsed data", parsedData.roomId);
+
 
         if (parsedData.type === "join_room") {
             const user = users.find(x => x.ws === ws);
@@ -74,24 +86,35 @@ wss.on("connection", (ws, request) => {
         if (parsedData.type === "chat") {
             const roomId = parsedData.roomId;
             const message = parsedData.message;
+            console.log("chat")
+            try {
 
-            await prismaClient.chat.create({
-                data: {
-                    roomId,
-                    message,
-                    userId
-                }
-            });
+                await prismaClient.chat.create({
+                    data: {
+                        roomId,
+                        message,
+                        userId
+                    }
+                });
+                console.log("users");
 
-            users.forEach(user => {
-                if (user.rooms.includes(roomId)) {
-                    user.ws.send(JSON.stringify({
-                        type: "chat",
-                        message: message,
-                        roomId
-                    }))
-                }
-            })
+                users.forEach(user => {
+                    const roomie = JSON.stringify(roomId)
+                    console.log("message sent to", user.rooms.includes(roomie), user)
+                    if (user.rooms.includes(roomie)) {
+                        console.log("message not sent to", user)
+                        user.ws.send(JSON.stringify({
+                            type: "chat",
+                            message: JSON.stringify(message),
+                            roomId
+
+                        }
+                        ))
+                    }
+                })
+            } catch (err) {
+                console.log(err)
+            }
         }
     })
 })

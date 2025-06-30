@@ -12,13 +12,25 @@ type Shape = {
     centerY: number;
     radius: number;
 }
-export default async function initDraw(canvas: HTMLCanvasElement, roomId: string) {
+export default async function initDraw(canvas: HTMLCanvasElement, roomId: string, socket: WebSocket) {
     const ctx = canvas.getContext("2d");
 
-
     let existingShapes: Shape[] = await getExistingShapes(roomId);
+    console.log("existing shapes", existingShapes);
 
     if (!ctx) { return };
+
+    socket.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+        let daat = JSON.parse(message.shape.message.shape);
+        console.log(daat);
+        // if (message.shape.type == "chat") {
+        //     const parsedShape = JSON.parse(message.shape);
+        //     console.log("Parsed shape", parsedShape.message.shape);
+        //     existingShapes.push(parsedShape.message.shape);
+        //     clearCanvas(existingShapes, canvas, ctx);
+        // }
+    }
 
 
     clearCanvas(existingShapes, canvas, ctx);
@@ -46,7 +58,22 @@ export default async function initDraw(canvas: HTMLCanvasElement, roomId: string
         clicked = false;
         const width = e.clientX - startX;
         const height = e.clientY - startY;
-        existingShapes.push({ type: "rect", x: startX, y: startY, height, width })
+        const shape: Shape = {
+            type: "rect",
+            x: startX,
+            y: startY,
+            height,
+            width
+        }
+        existingShapes.push(shape);
+
+        socket.send(JSON.stringify({
+            type: "chat",
+            message: JSON.stringify({
+                shape
+            }),
+            roomId: parseInt(roomId)
+        }))
     })
 }
 
@@ -60,7 +87,6 @@ function clearCanvas(existingShapes: Shape[], canvas: HTMLCanvasElement, ctx: Ca
         if (shape.type === "rect") {
             ctx.strokeStyle = "rgba(255,255,255)";
             ctx.strokeRect(shape.x, shape.y, shape.width, shape.height);
-
         }
     })
 }
@@ -69,9 +95,11 @@ async function getExistingShapes(roomId: string) {
     const res = await axios.get(`${HTTP_BACKEND}/chats/${roomId}`);
     const messages = res.data.messages;
 
+    console.log(messages);
+
     const shapes = messages.map((x: { message: string }) => {
         const messageData = JSON.parse(x.message);
-        return messageData;
+        return messageData.shape;
     })
 
     return shapes;

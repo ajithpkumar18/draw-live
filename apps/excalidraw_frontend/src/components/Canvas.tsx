@@ -1,40 +1,16 @@
-"use client"
 import initDraw from '@/draw';
-import React, { useEffect, useRef, useState } from 'react'
-import { WS_URL } from '../../config';
+import React, { useEffect, useRef } from 'react'
 
-export default function Canvas({ roomId }: { roomId: string }) {
+export default function Canvas({ roomId, socket }: { roomId: string, socket: WebSocket }) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [socket, setSocket] = useState<WebSocket | null>(null);
-
-    useEffect(() => {
-        const ws = new WebSocket(WS_URL);
-
-        ws.onopen = () => {
-            setSocket(ws)
-        }
-    }, [])
 
     useEffect(() => {
         if (canvasRef.current) {
-            const canvas = initDraw(canvasRef.current, roomId);
+            const canvas = initDraw(canvasRef.current, roomId, socket);
         }
     }, [canvasRef])
-
-    if (!socket) {
-        return <div className='bg-black h-screen w-screen text-white'>
-            Connecting to server....
-        </div>
-    }
-
     return (
-        <div className=" z-10 overflow-hidden">
-            <canvas ref={canvasRef} width={window.innerWidth} height={window.innerHeight} >
-            </canvas>
-            <div className="text-red-500">
-
-                Drawing Logic
-            </div>
-        </div>
+        <canvas ref={canvasRef} width={window.innerWidth} height={window.innerHeight} >
+        </canvas>
     )
 }
