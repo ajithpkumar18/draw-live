@@ -97,26 +97,32 @@ export class Game {
         this.clicked = true
         this.startX = e.clientX;
         this.startY = e.clientY;
+        console.log(this.selectedTool);
     }
     mouseMoveHandler = (e: MouseEvent) => {
         console.log(this.clicked)
         if (this.clicked) {
-            const width = e.clientX - this.startX;
-            const height = e.clientY - this.startY;
-            this.clearCanvas()
-            this.ctx.strokeStyle = "rgba(255,255,255)";
+            // const width = e.clientX - this.startX;
+            // const height = e.clientY - this.startY;
+            // this.clearCanvas()
+            // this.ctx.strokeStyle = "rgba(255,255,255)";
 
-            if (this.selectedTool === "rect") {
-                this.ctx.strokeRect(this.startX, this.startY, width, height);
-            }
-            else if (this.selectedTool === "circle") {
-                const radius = Math.max(width, height) / 2;
-                const centerX = this.startX + radius;
-                const centerY = this.startY + radius;
-                this.ctx.beginPath();
-                this.ctx.arc(centerX, centerY, Math.abs(radius), 0, 2 * Math.PI)
-                this.ctx.stroke();
-                this.ctx.closePath();
+            // if (this.selectedTool === "rect") {
+            //     this.ctx.strokeRect(this.startX, this.startY, width, height);
+            // }
+            // else if (this.selectedTool === "circle") {
+            //     const radius = Math.max(width, height) / 2;
+            //     const centerX = this.startX + radius;
+            //     const centerY = this.startY + radius;
+            //     this.ctx.beginPath();
+            //     this.ctx.arc(centerX, centerY, Math.abs(radius), 0, 2 * Math.PI)
+            //     this.ctx.stroke();
+            //     this.ctx.closePath();
+            // } else 
+            if (this.selectedTool === "pencil") {
+                this.drawLine(e);
+                this.startX = e.offsetX;
+                this.startY = e.offsetY;
             }
         }
     }
@@ -157,13 +163,23 @@ export class Game {
             return;
         }
 
-        this.socket.send(JSON.stringify({
-            type: "chat",
-            message: JSON.stringify({
-                shape
-            }),
-            roomId: parseInt(this.roomId)
-        }))
+        // this.socket.send(JSON.stringify({
+        //     type: "chat",
+        //     message: JSON.stringify({
+        //         shape
+        //     }),
+        //     roomId: parseInt(this.roomId)
+        // }))
+    }
+
+    drawLine(e: MouseEvent) {
+        this.ctx.beginPath();
+        this.ctx.strokeStyle = "rgba(255,255,255)";
+        this.ctx.lineWidth = 5;
+        this.ctx.moveTo(this.startX, this.startY)
+        this.ctx.lineTo(e.offsetX, e.offsetY);
+        this.ctx.closePath();
+        this.ctx.stroke();
     }
 
 
