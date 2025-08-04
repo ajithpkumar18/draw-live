@@ -6,8 +6,11 @@ import React, { ButtonHTMLAttributes, useState } from 'react'
 
 function MainPage() {
     const [roomName, setRoomName] = useState<String | null>();
-
+    const inituser = localStorage.getItem("user") as string;
+    const parsed = JSON.parse(inituser);
+    const firstname = parsed.name.split(' ')[0];
     const router = useRouter()
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         e.preventDefault();
@@ -58,6 +61,7 @@ function MainPage() {
     return (
         <div className='flex flex-col justify-center items-center w-screen h-screen bg-gray-900 ring-4 ring-indigo-500 shadow-inner shadow-indigo-400'>
             <p className=' flex justify-center items-center text-indigo-400 text-3xl h-20 shadow-lg shadow-indigo-500 fixed top-28 w-1/3 rounded-lg'>Draw Rooms</p>
+            {firstname && <p className='fixed top-10 right-10 text-2xl font-bold text-white shadow-sm shadow-indigo-500'>{firstname}</p>}
             <div className=' w-3/4 flex justify-evenly gap-5 pt-8 '>
                 <InputUI classname='ring w-2/3 p-3 bg-indigo-300 text-white placeholder-white' type='text' placeholder='Room name' onchange={handleChange} />
                 <button type='button' name="create" onClick={handleCreate} className='shadow-md shadow-indigo-600 outline-none p-3 w-64 flex-2 rounded-lg bg-indigo-600 text-white'>Create Room</button>
